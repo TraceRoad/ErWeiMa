@@ -1,0 +1,132 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<title></title>
+<script type="text/javascript" src="./js/jquery-1.8.2min.js"></script>
+<script type="text/javascript" src="./js/iframe.js"></script>
+<script type="text/javascript">
+	function GetRequest() {
+	   var url = location.search; //获取url中"?"符后的字串
+	   var theRequest = new Object();
+	   if (url.indexOf("?") != -1) {
+	   		var str = url.substr(1);
+	   		str=decodeURIComponent(str);
+	   		var strs=str.split("&");
+	   		for(var i=0;i<strs.length;i++){
+	   			theRequest[strs[i].split("=")[0]]=strs[i].split("=")[1];
+	   		}
+	   		return theRequest;
+	  }
+	}
+	var a=GetRequest(),b="",is_ywym=false;
+	var coding,hostUrl=window.location.host,url=window.location.href;
+	function get_coding(){
+		var str=a["name"];
+		var strs=str.split("/");
+		if(strs.length>=4){
+			is_ywym=true;
+		}
+		if(url.indexOf("pro.cli")!=-1){
+			coding=strs[3];
+		}else{
+			coding=strs[4];
+		}
+		if(coding.indexOf('?is_preview')!=-1){
+			var strNewCoding=coding.split('?');
+			coding=strNewCoding[0];
+		}
+		b=str;
+	}
+	get_coding();
+	window.onload=function(){
+		if( a["time"] == "1"){
+		   var url = location.search; //获取url中"?"符后的字串
+		   var theRequest = new Object();
+		   if (url.indexOf("?") != -1&&url.indexOf("uuid") != -1) {
+			  document.getElementById("if_type").src=a["name"]+"&stime=2";
+		   } else{
+			  document.getElementById("if_type").src=a["name"]+"?stime=2";
+		   }
+		}
+
+	};
+	function get_qrimg(url,is_pro_url)
+	{	 
+		var _this=$(".qrimg"),data={};
+		data['coding']=coding;
+		if(is_pro_url){
+			data['pro_url']=b;
+			data['is_ywym']=is_ywym;
+		}
+		$.ajax({
+			url:url,
+			type:"post",
+			data:data,
+			async:false,
+			success:function(ret){
+				if(ret.status==1) {
+					_this.find("img").attr("src",ret.data);
+				}
+				else if(ret.status==-1){ 
+					get_qrimg();
+				};
+			}
+		});
+	}
+	$(function(){
+		if(url.indexOf("test")!=-1){
+			get_qrimg("/index/getqrcodeimage");
+		}else if(url.indexOf("pro")!=-1){
+			if(hostUrl.indexOf("pro")!=-1){
+				hostUrl=hostUrl.replace('pro','biz')
+				var newUrl="http://"+hostUrl+"/pro/get_qrcode_image";
+				get_qrimg(newUrl,1);
+			}else{
+				get_qrimg("/pro/get_qrcode_image",1);
+			}
+		}else if(url.indexOf("vcardview")!=-1){
+			get_qrimg("/vcard/get_qrcode_image");
+		}
+		
+	});
+ </script>
+<style type="text/css">
+	body{
+		background-color:#e7e8eb;
+	}
+	.phone_wrap{
+		background-color: #fff;
+		position: relative;
+		left:50%;
+		width: 640px;
+		margin-left: -320px;
+		border-left:1px solid #d9dadc;
+		border-right:1px solid #d9dadc;
+	}
+	.qrimg{
+		display: block!important;
+		position: absolute;
+		right:-200px;
+		top: 20px;
+		background-color: #fff;
+		text-align: center;
+		border:1px solid #d9dadc;
+		padding:16px;
+	}
+	.qrimg p{
+		font-size: 14px;
+		line-height: 20px;
+		color: #717375;
+		margin: 0px;
+	}
+	.qr_code_pc_img{
+		width: 102px;
+	}
+</style>
+</head>
+<body style="margin:0px;overflow-x:hidden;overflow-y:hidden;">
+ 	<div class="phone_wrap" style="height: 400px;">
+	 	<iframe frameborder="0" id="if_type" width="640px" src="http://localhost:8080/ErWeiMa/?stime=2" style="height: 400px;">
+		</iframe>
+	</div>
+</body></html>

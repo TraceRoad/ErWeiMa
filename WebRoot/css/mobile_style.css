@@ -1,0 +1,8 @@
+/*解决编辑器下排序编号显示问题 */
+.rich_text li {list-style: inherit;}
+/*表格边框不显示bug*/
+.rich_text th, .rich_text td,
+.type_clsdir th, .type_clsdir td { 
+  padding: 5px 10px;
+  border: 1px solid #DDD;
+}
